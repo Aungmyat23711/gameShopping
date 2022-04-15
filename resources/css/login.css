@@ -1,0 +1,31 @@
+.loginframe {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 85vh;
+    width: 100%;
+}
+h2 {
+    letter-spacing: 1px;
+    color: #fff;
+    font-weight: bold;
+}
+.avatar-enter {
+    transform: translateX(10px);
+    opacity: 0;
+}
+.avatar-enter-active,
+.fade-leave-active {
+    transition: all 0.5s ease-out;
+}
+.fade-leave-to {
+    transform: translateX(-10px);
+    opacity: 0;
+}
+.registerFrame {
+    width: 100%;
+    height: 85vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}

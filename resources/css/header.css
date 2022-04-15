@@ -1,0 +1,30 @@
+.activeClass {
+    background-color: #4653b9 !important;
+}
+#removeClass::before {
+    background-color: transparent !important;
+}
+
+.frame {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.carouselBackground {
+    background: rgba(255, 255, 255, 0.2);
+
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}
+.row {
+    max-width: 1185px;
+}
+.fade-up-enter {
+    transform: translateY(40px);
+    opacity: 0;
+}
+.fade-up-enter-active {
+    transition: all 2s ease;
+}
