@@ -6,14 +6,28 @@
           <v-col cols="12" md="8">
             <v-row>
               <v-col cols="12" md="12">
-                <v-hover v-slot="{ hover }">
+                <v-hover>
                   <v-carousel height="400" hide-delimiters cycle>
-                    <v-carousel-item
-                      v-for="(item, i) in datas"
-                      :key="i"
-                      :src="`/resources/${item.image}`"
-                    >
-                      <v-expand-transition>
+                    <v-carousel-item v-for="(item, i) in promotions" :key="i">
+                      <v-img
+                        :aspect-ratio="16 / 9"
+                        :src="`/resources/${item.image}`"
+                        :lazy-src="`/resources/${item.image}`"
+                      >
+                        <template v-slot:placeholder>
+                          <v-row
+                            class="fill-height ma-0"
+                            align="center"
+                            justify="center"
+                          >
+                            <v-progress-circular
+                              indeterminate
+                              color="grey lighten-5"
+                            ></v-progress-circular>
+                          </v-row>
+                        </template>
+                      </v-img>
+                      <!-- <v-expand-transition>
                         <div
                           v-if="hover"
                           class="
@@ -57,10 +71,9 @@
                               }}
                               MMK
                             </h4>
-                            <v-btn dark tile>Shop Now</v-btn>
                           </div>
                         </div>
-                      </v-expand-transition>
+                      </v-expand-transition> -->
                     </v-carousel-item>
                   </v-carousel>
                 </v-hover>
@@ -75,7 +88,23 @@
                 v-for="img in datas.slice(1, 3)"
                 :key="img.id"
               >
-                <v-img :aspect-ratio="16 / 9" :src="`/resources/${img.image}`">
+                <v-img
+                  :aspect-ratio="16 / 9"
+                  :src="`/resources/${img.image}`"
+                  :lazy-src="`/resources/${img.image}`"
+                >
+                  <template v-slot:placeholder>
+                    <v-row
+                      class="fill-height ma-0"
+                      align="center"
+                      justify="center"
+                    >
+                      <v-progress-circular
+                        indeterminate
+                        color="grey lighten-5"
+                      ></v-progress-circular>
+                    </v-row>
+                  </template>
                 </v-img>
               </v-col>
             </v-row>
@@ -122,13 +151,26 @@
           center-active
           show-arrows
         >
-          <v-slide-item v-for="n in datas.slice(0, 5).reverse()" :key="n.id">
+          <v-slide-item
+            v-for="n in datas.slice(0, 5).reverse()"
+            :key="n.id"
+            class="d-flex child-flex"
+          >
             <v-img
               :src="`/resources/${n.image_item}`"
+              :lazy-src="`/resources/${n.image_item}`"
               :alt="n.name"
               class="img ma-5"
               @mouseover="visible = n.id"
             >
+              <template v-slot:placeholder>
+                <v-row class="fill-height ma-0" align="center" justify="center">
+                  <v-progress-circular
+                    indeterminate
+                    color="grey lighten-5"
+                  ></v-progress-circular>
+                </v-row>
+              </template>
               <div class="platform ml-2">
                 <v-btn small>{{ n.platform }}</v-btn>
               </div>
@@ -261,6 +303,7 @@ export default {
       quickPlatform: "",
       active: "",
       user_id: "",
+      promotions: [{ image: "discount.jpg" }, { image: "itemsekio.jpg" }],
     };
   },
   components: {
@@ -279,7 +322,10 @@ export default {
 
     async getData() {
       await axios.get("/admin/readgame").then((resp) => {
-        this.datas = resp.data;
+        // this.datas = resp.data;
+        this.datas = resp.data.filter(
+          (val) => val.platform.toUpperCase() == "PS4" && val
+        );
       });
     },
     async getDataByUserId() {
@@ -294,14 +340,18 @@ export default {
     },
   },
   mounted() {
-    window.axios.defaults.headers.common[
-      "Authorization"
-    ] = `Bearer ${this.userData}`;
-    axios.get("/api/user").then((resp) => {
-      this.user_id = resp.data.id;
-      this.getDataByUserId();
-    });
-    // this.getData();
+    if (this.userData) {
+      window.axios.defaults.headers.common[
+        "Authorization"
+      ] = `Bearer ${this.userData}`;
+      axios.get("/api/user").then((resp) => {
+        this.user_id = resp.data.id;
+        // this.getDataByUserId();
+      });
+      this.getData();
+    } else {
+      this.getData();
+    }
 
     this.scrollToTop();
   },

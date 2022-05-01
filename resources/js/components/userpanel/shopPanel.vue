@@ -3,11 +3,11 @@
     <v-navigation-drawer
       v-model="drawer"
       stateless
-      class="sidenav"
+      class="sidenav hidden-sm-and-down"
       dark
       height="100%"
     >
-      <v-expansion-panels v-model="panel" tile>
+      <v-expansion-panels dark v-model="panel" multiple tile>
         <v-expansion-panel>
           <v-expansion-panel-header> Categories </v-expansion-panel-header>
           <v-expansion-panel-content>
@@ -17,16 +17,47 @@
                 <v-chip x-small @click="getAllGames"> {{ allCount }}</v-chip>
               </span>
             </div>
-            <div v-for="category in categories" :key="category.id" class="pa-2">
+            <div
+              v-for="category in categories.slice(1, categories.length)"
+              :key="category.id"
+              class="pa-2"
+            >
               <span class="caption">{{ category.category }}</span>
-              <span
-                ><v-chip
+              <span>
+                <v-chip
                   x-small
                   @click="gameController(category.id, category.category)"
-                  >{{ getTotalCategory(category.id) }}</v-chip
-                ></span
+                >
+                  <v-progress-circular
+                    indeterminate
+                    color="black"
+                    :width="3"
+                    :size="10"
+                    v-if="loading"
+                  ></v-progress-circular>
+
+                  {{ loading == false ? getTotalCategory(category.id) : null }}
+                </v-chip></span
               >
             </div>
+          </v-expansion-panel-content>
+        </v-expansion-panel>
+        <v-expansion-panel>
+          <v-expansion-panel-header> Filter Price </v-expansion-panel-header>
+          <v-expansion-panel-content>
+            <v-range-slider
+              @change="slideRange"
+              :value="rangeData"
+              :max="max"
+              :min="min"
+              step="10"
+              class="align-center"
+            >
+            </v-range-slider>
+            <span v-if="rangeData" class="caption"
+              >Price {{ rangeData[0] }} MMK - {{ rangeData[1] }} MMK</span
+            >
+            <v-btn @click="filter">Filter</v-btn>
           </v-expansion-panel-content>
         </v-expansion-panel>
       </v-expansion-panels>
@@ -38,54 +69,43 @@
 
 <script>
 import axios from "axios";
-import { eventBus } from "../../app";
+
 import ShopList from "./path/shopList.vue";
+
+import { shopPanel } from "./utils/reuseableShopPanel";
+import { mapGetters } from "vuex";
 export default {
+  mixins: [shopPanel],
   data() {
     return {
+      min: 0,
+      max: 300000,
       categories: [],
-      panel: 0,
-      allTotalCategoies: [],
-      drawer: true,
-      allGamesByCatId: [],
-      allCount: 0,
     };
+  },
+  computed: {
+    ...mapGetters(["rangeData"]),
   },
   components: {
     ShopList,
   },
   methods: {
+    slideRange(event) {
+      this.$store.dispatch("setRangeData", event);
+    },
     async readCategory() {
       await axios.get("/admin/sub/category/read").then((resp) => {
         this.categories = resp.data;
+        this.categories.unshift({ category: "All" });
       });
     },
-    async getCategoryCount() {
-      let platform = this.$route.params.platform.toUpperCase();
-      await axios.get(`/user/shop/getCount/${platform}`).then((resp) => {
-        this.allTotalCategoies = resp.data;
-      });
-    },
-    getTotalCategory(id) {
-      let data = this.allTotalCategoies.filter((val) => {
-        if (val.category_id == id) return val;
-      });
-      return data.length;
-    },
-    gameController(id, category) {
-      eventBus.$emit("getByCatId", { id, category });
-    },
-
-    scrollToTop() {
-      window.scrollTo(0, 0);
-    },
-    async getAlldata() {
-      await axios.get("/admin/readgame").then((resp) => {
-        this.allCount = resp.data.length;
-      });
-    },
-    getAllGames() {
-      eventBus.$emit("getAllGames");
+  },
+  watch: {
+    $route(to, from) {
+      this.readCategory();
+      this.getCategoryCount();
+      this.scrollToTop();
+      this.getAlldata();
     },
   },
   mounted() {

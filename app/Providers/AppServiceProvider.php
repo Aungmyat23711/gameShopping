@@ -2,6 +2,11 @@
 
 namespace App\Providers;
 
+use App\Models\Favorite;
+use App\Models\Game;
+use App\Models\Order;
+use App\Observers\GameObserver;
+use App\Observers\OrderObserver;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -23,6 +28,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        //
+        Game::observe(GameObserver::class);
+        Order::observe(OrderObserver::class);
+     
     }
 }

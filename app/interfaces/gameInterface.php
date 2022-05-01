@@ -11,8 +11,9 @@ interface gameInterface{
     public function getTotalPlatformData();
     public function gotPlatformById($id);
     public function getProductsPaginate($platform);
-    public function getAllGamesByCatId($id);
+    public function getAllGamesByCatId($platform,$id);
     public function getCartGamesById($id);
     public function getDatasByUserId($uid);
+    public function getTooManyProducts($platform);
 
 }

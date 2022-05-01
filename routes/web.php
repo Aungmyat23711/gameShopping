@@ -5,6 +5,7 @@ use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\EditionController;
 use App\Http\Controllers\FavoriteController;
 use App\Http\Controllers\GameController;
+use App\Http\Controllers\OrderController;
 use App\Http\Controllers\PhotoController;
 use App\Http\Controllers\PlatformController;
 use App\Http\Controllers\VoiceController;
@@ -68,6 +69,7 @@ Route::post('/admin/addgame/restadd/addingCategory',[CategoryController::class,'
 Route::get('/admin/addgame/restadd/gettingCategory/{id}',[CategoryController::class,'gotCategory']);
 Route::delete('/admin/addgame/restadd/deleteCategory/{id}',[CategoryController::class,'deleteCategory']);
 Route::get('/user/index/getCategory/{id}',[CategoryController::class,'getCategory']);
+Route::get('/user/shop/getAllCount/{platform}',[CategoryController::class,'getAllCountPlatform']);
 //Photo
 Route::post('/admin/addgame/restadd/addphotos/{id}/{index}',[PhotoController::class,'create']);
 Route::get('/admin/addgame/restadd/getPhotoById/{id}',[PhotoController::class,'readPhotoById']);
@@ -81,6 +83,8 @@ Route::view('/user/register','usersetup');
 Route::get('/user/getGamesCategory',[GameController::class,'getGamesCategory']);
 Route::get('/user/getTplatformData',[GameController::class,'getTplatformData']);
 Route::get('/user/information/getPlatformById/{id}',[GameController::class,'getPlatformById']);
+Route::get('/user/shop/getAllProduct/{platform}',[GameController::class,'getAllProducts']);
+Route::get('/user/shop/getAllProducts/{platform}',[GameController::class,'getManyProducts']);
 //whishlist
 
 Route::post('/user/information/addwhistlist',[FavoriteController::class,'create']);
@@ -91,12 +95,12 @@ Route::delete('/user/whishlist/delete/{id}',[FavoriteController::class,'delete']
 Route::get('/user/index/getwhishlistcount/{uid}',[FavoriteController::class,'getWhishlistCount']);
 Route::view('/user/shop/{platform}','usersetup');
 Route::get('/user/shop/getCount/{platform}',[CategoryController::class,'getAllCount']);
-Route::get('/user/shop/getAllProduct/{platform}',[GameController::class,'getAllProducts']);
+
 Route::get('/user/shop/getPlatformByGameId/{id}',[PlatformController::class,'getPlatformByGameId']);
 Route::get('/user/shop/{platform}/{current}/{total}',function(){
     return view('usersetup');
 });
-Route::get('/user/shop/getGamesByCategoryId/{id}',[GameController::class,'getGamesByCatId']);
+Route::match(['get','post'],'/user/shop/getGamesByCategoryId/{id}',[GameController::class,'getGamesByCatId']);
 Route::get('/user/addtocart',function(){
     return view('usersetup');
 });
@@ -108,4 +112,7 @@ Route::get('/user/index/getcartlistcount/{uid}',[CartController::class,'getCartl
 Route::delete('/user/addtocart/deleteCartGame/{id}',[CartController::class,'deleteCartGame']);
 Route::get('/user/index/getDataByUserId/{uid}',[GameController::class,'getDataByUserId']);
 Route::view('/user/myorders','usersetup');
+Route::post('/user/myorders/insert',[OrderController::class,'insert']);
+
+//account
 ?>

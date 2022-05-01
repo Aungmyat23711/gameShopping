@@ -17,12 +17,25 @@
       <v-card dark>
         <v-card-text>
           <v-row>
-            <v-col cols="12" md="6">
+            <v-col cols="12" md="6" class="d-flex child-flex">
               <v-img
                 :src="`/resources/${data.image_item}`"
+                :lazy-src="`/resources/${data.image_item}`"
                 :aspect-ratio="15 / 22"
                 style="position: relative"
               >
+                <template v-slot:placeholder>
+                  <v-row
+                    class="fill-height ma-0"
+                    align="center"
+                    justify="center"
+                  >
+                    <v-progress-circular
+                      indeterminate
+                      color="#fff"
+                    ></v-progress-circular>
+                  </v-row>
+                </template>
                 <v-chip
                   v-if="data.discount"
                   class="ma-2"
@@ -104,8 +117,11 @@
                       min="0"
                       v-model="qty"
                     ></v-text-field>
-                    <v-btn @click="qty++"> + </v-btn>
+                    <v-btn @click="increaseQty"> + </v-btn>
                   </v-btn-toggle>
+                  <span class="d-block red--text font-weight-bold">
+                    {{ qtyError }}
+                  </span>
                 </v-col>
                 <v-col cols="12" md="6">
                   <v-btn
@@ -163,6 +179,7 @@ export default {
       allCategory: [],
       user_id: "",
       condition: 0,
+      qtyError: "",
     };
   },
   props: ["data", "callAgain"],
@@ -174,30 +191,38 @@ export default {
       this.qty = cartqty;
     },
     async addToCart(dialog) {
-      await axios
-        .post("/user/index/addtocart", {
-          user_id: this.user_id,
-          game_id: this.data.id,
-          qty: this.qty,
-        })
-        .then((resp) => {
-          dialog.value = false;
-          eventBus.$emit("addCartList");
-        });
+      if (this.qty != 0) {
+        await axios
+          .post("/user/index/addtocart", {
+            user_id: this.user_id,
+            game_id: this.data.id,
+            qty: this.qty,
+          })
+          .then((resp) => {
+            dialog.value = false;
+            eventBus.$emit("addCartList");
+          });
+      } else {
+        this.qtyError = "Please Choose At Least One Item";
+      }
     },
 
     async updateCart(id, dialog) {
-      let formData = new FormData();
-      formData.append("user_id", this.user_id);
-      formData.append("game_id", this.data.id);
-      formData.append("qty", this.qty);
-      formData.append("_method", "PUT");
-      await axios
-        .post(`/user/index/updatecart/${id}`, formData)
-        .then((resp) => {
-          this.callAgain();
-          dialog.value = false;
-        });
+      if (this.qty != 0) {
+        let formData = new FormData();
+        formData.append("user_id", this.user_id);
+        formData.append("game_id", this.data.id);
+        formData.append("qty", this.qty);
+        formData.append("_method", "PUT");
+        await axios
+          .post(`/user/index/updatecart/${id}`, formData)
+          .then((resp) => {
+            this.callAgain();
+            dialog.value = false;
+          });
+      } else {
+        this.qtyError = "Please Choose At Least One Item";
+      }
     },
     goToCart() {
       this.$router.push("/user/addtocart");
@@ -216,18 +241,24 @@ export default {
           this.cartloading = false;
         });
     },
+    increaseQty() {
+      this.qty++;
+      this.qtyError = "";
+    },
   },
   computed: {
     ...mapGetters(["userData"]),
   },
   mounted() {
-    window.axios.defaults.headers.common[
-      "Authorization"
-    ] = `Bearer ${this.userData}`;
-    axios.get("/api/user").then((resp) => {
-      this.user_id = resp.data.id;
-      this.checkInCart();
-    });
+    if (this.userData) {
+      window.axios.defaults.headers.common[
+        "Authorization"
+      ] = `Bearer ${this.userData}`;
+      axios.get("/api/user").then((resp) => {
+        this.user_id = resp.data.id;
+        this.checkInCart();
+      });
+    }
     this.takeCategoryByGameId(this.data.id);
     this.scrollTop();
   },

@@ -26,6 +26,17 @@
               </tr>
             </thead>
             <tbody>
+              <tr>
+                <td colspan="5" align="center">
+                  <v-progress-circular
+                    :size="40"
+                    v-if="loading"
+                    :width="7"
+                    color="#fff"
+                    indeterminate
+                  ></v-progress-circular>
+                </td>
+              </tr>
               <tr v-for="data in whishlists" :key="data.fid">
                 <td style="width: 300px">
                   <v-img
@@ -103,6 +114,7 @@ export default {
       whishlists: [],
       categories: [],
       user_id: "",
+      loading: false,
       platforms: "",
       platform: "",
       items: [
@@ -117,10 +129,12 @@ export default {
 
   methods: {
     async getWhishList() {
+      this.loading = true;
       await axios
         .get(`/user/whishlist/getwhishlist/${this.user_id}`)
         .then((resp) => {
           this.whishlists = resp.data;
+          this.loading = false;
         });
     },
     async deleteWhishList(id) {
@@ -158,11 +172,16 @@ export default {
     window.axios.defaults.headers.common[
       "Authorization"
     ] = `Bearer ${this.userData}`;
-    axios.get("/api/user").then((resp) => {
-      this.user_id = resp.data.id;
-      this.getWhishList();
-    });
+    if (this.userData) {
+      axios.get("/api/user").then((resp) => {
+        this.user_id = resp.data.id;
+        this.getWhishList();
+      });
+    }
     this.scrollTop();
+    eventBus.$on("userislogout", () => {
+      this.whishlists = [];
+    });
   },
 };
 </script>

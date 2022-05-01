@@ -9,4 +9,5 @@ interface categoryInterface{
     public function deletedCategory($id);
     public function getCategoryById($id);
     public function getAllTCount($platform);
+    public function getAllCountByPlatform($platform);
 }

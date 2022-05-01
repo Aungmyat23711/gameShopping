@@ -51,8 +51,9 @@ class GameController extends Controller
    public function getAllProducts($platform){
        return $this->gameInterface->getProductsPaginate($platform);
    }
-   public function getGamesByCatId($id){
-       return $this->gameInterface->getAllGamesByCatId($id);
+   public function getGamesByCatId(Request $req,$id){
+       return $this->gameInterface->getAllGamesByCatId($req, $id);
+    
    }
    public function getCartGames($id){
        return $this->gameInterface->getCartGamesById($id);
@@ -60,4 +61,8 @@ class GameController extends Controller
    public function getDataByUserId($uid){
        return $this->gameInterface->getDatasByUserId($uid);
    }
+   public function getManyProducts($platform){
+       return $this->gameInterface->getTooManyProducts($platform);
+   }
+  
 }

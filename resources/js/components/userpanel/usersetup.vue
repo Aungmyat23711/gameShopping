@@ -38,15 +38,23 @@
                       v-on="on"
                       :style="{ 'background-color': hover ? '#4653b9' : '' }"
                     >
-                      <v-icon left>sports_esports</v-icon>
-                      <span>Game</span>
+                      <v-icon class="pl-3" left>sports_esports</v-icon>
+                      <span>Platforms</span>
                       <v-icon>expand_more</v-icon>
                     </v-btn>
                   </v-hover>
                 </template>
-                <v-card class="mt-1">
+                <v-card class="mt-1" dark>
                   <v-card-text>
-                    <h1>Hello World</h1>
+                    <v-list v-for="link in links" :key="link.title">
+                      <v-list-item :to="link.link">
+                        <v-list-item-content>
+                          <v-list-item-title>
+                            {{ link.title }}
+                          </v-list-item-title>
+                        </v-list-item-content>
+                      </v-list-item>
+                    </v-list>
                   </v-card-text>
                 </v-card>
               </v-menu>
@@ -67,12 +75,8 @@
           <v-spacer></v-spacer>
 
           <div class="d-flex">
-            <v-btn class="ml-1" text fab>
-              <v-icon size="30">account_circle</v-icon>
-            </v-btn>
-            <v-btn class="ml-1" text fab>
-              <v-icon size="30">search</v-icon>
-            </v-btn>
+            <search />
+            <Useraccount />
             <v-badge color="primary" :content="whishlists" dark overlap>
               <v-btn class="ml-1" text fab to="/user/whishlist">
                 <v-icon size="30">favorite</v-icon>
@@ -96,7 +100,7 @@
         <div class="footer-top">
           <v-row>
             <v-col cols="12" md="12">
-              <v-btn text>My Account</v-btn>
+              <v-btn>My Account</v-btn>
               <v-btn text>My Orders</v-btn>
               <v-btn text>Favourate List</v-btn>
               <v-btn text>Shooping Basket</v-btn>
@@ -184,6 +188,8 @@ import { eventBus } from "../../app";
 import SideNav from "../userpanel/path/sidenav.vue";
 import { mapGetters } from "vuex";
 import axios from "axios";
+import Useraccount from "./path/useraccount.vue";
+import Search from "./path/search.vue";
 export default {
   data() {
     return {
@@ -196,10 +202,20 @@ export default {
       whishlists: "0",
       cartlists: "0",
       user_id: "",
+      links: [
+        { title: "PS4", link: "/user/shop/PS4" },
+        { title: "PS5", link: "/user/shop/PS5" },
+        { title: "PC", link: "/user/shop/PC" },
+        { title: "XBOX ONE", link: "/user/shop/XBOXONE" },
+        { title: "XBOX S", link: "/user/shop/XBOXS" },
+        { title: "NINTENDO", link: "/user/shop/NINTENDO" },
+      ],
     };
   },
   components: {
     SideNav,
+    Useraccount,
+    Search,
   },
   computed: {
     ...mapGetters(["userData"]),
@@ -211,32 +227,51 @@ export default {
     async getWhishListCount(uid) {
       await axios.get(`/user/index/getwhishlistcount/${uid}`).then((resp) => {
         this.whishlists = resp.data.toString();
+        console.log("whistlistcount");
       });
     },
     getUser() {
+      window.axios.defaults.headers.common[
+        "Authorization"
+      ] = `Bearer ${this.userData}`;
       axios.get("/api/user").then((resp) => {
-        this.user_id = resp.data.id;
-        this.getWhishListCount(resp.data.id);
-        this.getCartLists(resp.data.id);
+        if (resp.data.id) {
+          this.user_id = resp.data.id;
+        } else {
+          this.user_id = 0;
+        }
+        this.getWhishListCount(this.user_id);
+        this.getCartLists(this.user_id);
       });
     },
     async getCartLists(uid) {
       await axios.get(`/user/index/getcartlistcount/${uid}`).then((resp) => {
         this.cartlists = resp.data.toString();
+        console.log("cartlistcount");
       });
     },
   },
+  watch: {
+    userData(next, prev) {
+      if (next) {
+        this.getUser();
+      }
+    },
+  },
   mounted() {
-    window.axios.defaults.headers.common[
-      "Authorization"
-    ] = `Bearer ${this.userData}`;
-    this.getUser();
-    eventBus.$on("addWhistList", () => {
+    if (this.userData) {
       this.getUser();
-    });
-    eventBus.$on("addCartList", () => {
-      this.getUser();
-    });
+      eventBus.$on("userislogout", () => {
+        this.whishlists = "0";
+        this.cartlists = "0";
+      });
+      eventBus.$on("addWhistList", () => {
+        this.getUser();
+      });
+      eventBus.$on("addCartList", () => {
+        this.getUser();
+      });
+    }
   },
 };
 </script>

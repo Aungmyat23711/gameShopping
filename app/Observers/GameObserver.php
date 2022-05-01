@@ -14,7 +14,7 @@ class GameObserver
      */
     public function created(Game $game)
     {
-        //
+     //
     }
 
     /**

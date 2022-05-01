@@ -18,10 +18,13 @@ class CreateOrdersTable extends Migration
             $table->string('user_id');
             $table->string('game_id');
             $table->integer('qty');
+            $table->integer('price');
             $table->string('payment_method');
+            $table->string('user_name');
+            $table->integer('discount');
             $table->string('status');
-            $table->string('total_price');
-            
+            $table->string('address');
+            $table->string('phone');
             $table->timestamps();
         });
     }

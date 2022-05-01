@@ -13,6 +13,7 @@ import ShopPanel from "../components/userpanel/shopPanel";
 import addToCart from "../components/userpanel/addToCart";
 import myOrders from "../components/userpanel/myorders";
 import store from "../vuex";
+
 const routes = [
     // {
     //     name: "admindashboard",

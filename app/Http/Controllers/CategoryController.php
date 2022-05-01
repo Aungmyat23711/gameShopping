@@ -46,4 +46,7 @@ class CategoryController extends Controller
   {
       return $this->categoryInterface->getAllTCount($platform);
   }
+  public function getAllCountPlatform($platform){
+      return $this->categoryInterface->getAllCountByPlatform($platform);
+  }
 }

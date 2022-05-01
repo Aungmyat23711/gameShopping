@@ -26,6 +26,17 @@
               </tr>
             </thead>
             <tbody>
+              <tr>
+                <td colspan="5" align="center">
+                  <v-progress-circular
+                    :size="40"
+                    v-if="loading"
+                    :width="7"
+                    color="#fff"
+                    indeterminate
+                  ></v-progress-circular>
+                </td>
+              </tr>
               <tr v-for="data in cartGames" :key="data.fid">
                 <td style="width: 300px">
                   <v-img
@@ -60,7 +71,7 @@
                     {{ data.discount }} % off
                   </div>
                 </td>
-                <td align="center">
+                <td>
                   <div>{{ data.platform }}</div>
                 </td>
                 <td>
@@ -106,7 +117,7 @@ export default {
   data() {
     return {
       cartGames: [],
-
+      loading: false,
       user_id: "",
       items: [
         { text: "Home", disabled: false, href: "/user/index" },
@@ -120,10 +131,12 @@ export default {
 
   methods: {
     async getAddToCartGame() {
+      this.loading = true;
       await axios
         .get(`/user/addtocart/getCartGames/${this.user_id}`)
         .then((resp) => {
           this.cartGames = resp.data;
+          this.loading = false;
         });
     },
     scrollTop() {
@@ -161,12 +174,17 @@ export default {
     ...mapGetters(["userData"]),
   },
   mounted() {
-    window.axios.defaults.headers.common[
-      "Authorization"
-    ] = `Bearer ${this.userData}`;
-    axios.get("/api/user").then((resp) => {
-      this.user_id = resp.data.id;
-      this.getAddToCartGame();
+    if (this.userData) {
+      window.axios.defaults.headers.common[
+        "Authorization"
+      ] = `Bearer ${this.userData}`;
+      axios.get("/api/user").then((resp) => {
+        this.user_id = resp.data.id;
+        this.getAddToCartGame();
+      });
+    }
+    eventBus.$on("userislogout", () => {
+      this.cartGames = [];
     });
     this.scrollTop();
   },

@@ -122,12 +122,13 @@ class gameRepository implements gameInterface{
        return $data;
     }
     public function getProductsPaginate($platform){
-       $data=Game::where('platform',$platform)->paginate(8);
+       $data=Game::where('platform',$platform)->paginate(10);
        return $data;
     }
-    public function getAllGamesByCatId($id){
+    public function getAllGamesByCatId($platform,$id){
         $data=DB::table('games')->join('totalcategories as TC','games.id','TC.game_id')
         ->where('TC.category_id',$id)
+        ->where('games.platform',$platform->platform)
         ->select('games.*')
         ->get();
         return $data;
@@ -145,6 +146,10 @@ class gameRepository implements gameInterface{
         // ->select('games.*','carts.qty as cartqty')
         // ->orderBy('created_at','desc')->get();
         $data=Game::orderBy('created_at','desc')->get();
+        return $data;
+    }
+    public function getTooManyProducts($platform){
+        $data=Game::where('platform',$platform)->get();
         return $data;
     }
 }

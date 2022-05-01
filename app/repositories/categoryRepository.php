@@ -57,4 +57,8 @@ class categoryRepository implements categoryInterface{
         ->select('TC.*')->get();
         return $data;
     }
+    public function getAllCountByPlatform($platform){
+        $data=Game::where('platform',$platform)->count();
+        return $data;
+    }
 }

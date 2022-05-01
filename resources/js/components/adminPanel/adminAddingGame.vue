@@ -304,7 +304,7 @@ export default {
       formData.append("price", this.form.price);
       formData.append("qty", this.form.qty);
       formData.append("discount", this.form.discount);
-      formData.append("platform", this.form.platform);
+      formData.append("platform", this.form.platform.toUpperCase());
       formData.append("image", this.form.file);
       formData.append("image_item", this.form.fileItem);
       formData.append("description", this.form.description);
@@ -345,7 +345,7 @@ export default {
       formData.append("image", this.form.file);
       formData.append("image_item", this.form.fileItem);
       formData.append("description", this.form.description);
-      formData.append("platform", this.form.platform);
+      formData.append("platform", this.form.platform.toUpperCase());
       formData.append("current", this.image);
       formData.append("current_item", this.imageItem);
       formData.append("_method", "PUT");
@@ -411,7 +411,7 @@ export default {
       this.form.game_mode = item.game_mode;
       this.form.price = item.price;
       this.form.qty = item.qty;
-      this.form.discount = item.discount;
+      this.form.discount = item.discount == null ? 0 : item.discount;
       this.form.platform = item.platform;
       this.image = item.image;
       this.imageItem = item.image_item;

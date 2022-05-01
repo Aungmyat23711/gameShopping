@@ -16,9 +16,18 @@
             <v-img
               v-if="loading == false"
               :src="`/resources/${datas.image_item}`"
+              :lazy-src="`/resources/${datas.image_item}`"
               :aspect-ratio="20 / 26"
               style="position: relative"
             >
+              <template v-slot:placeholder>
+                <v-row class="fill-height ma-0" align="center" justify="center">
+                  <v-progress-circular
+                    indeterminate
+                    color="#fff"
+                  ></v-progress-circular>
+                </v-row>
+              </template>
               <v-chip
                 v-if="datas.discount"
                 class="ma-2"
@@ -234,8 +243,7 @@ export default {
         .then((resp) => {
           this.datas = resp.data[0];
           this.loading = false;
-          this.isWhistList();
-          this.checkInCart(resp.data[0].id);
+
           this.items = [
             ...this.items,
             {
@@ -312,13 +320,21 @@ export default {
     ...mapGetters(["userData"]),
   },
   mounted() {
-    window.axios.defaults.headers.common[
-      "Authorization"
-    ] = `Bearer ${this.userData}`;
-    axios.get("/api/user").then((resp) => {
-      this.user_id = resp.data.id;
+    if (this.userData) {
+      window.axios.defaults.headers.common[
+        "Authorization"
+      ] = `Bearer ${this.userData}`;
+      this.loading = true;
+      axios.get("/api/user").then((resp) => {
+        this.loading = false;
+        this.user_id = resp.data.id;
+        this.getByGameId();
+        this.isWhistList();
+        this.checkInCart(this.data[0].id);
+      });
+    } else {
       this.getByGameId();
-    });
+    }
 
     this.takeCategoryByGameId();
     this.scrollTop();
