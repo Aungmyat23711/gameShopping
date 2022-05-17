@@ -24,7 +24,7 @@ class gameRepository implements gameInterface
             $file2 = $game->image_item;
             $ext2 = $file2->getClientOriginalExtension();
             $photo2 = time() . '.' . $ext2;
-            $path = $file2->move('resources/', $photo2);
+            $path2 = $file2->move('resources/', $photo2);
         } else {
             $photo2 = null;
         }
@@ -52,8 +52,7 @@ class gameRepository implements gameInterface
     public function put($id, $game)
     {
 
-        global $photo;
-        global $photo2;
+
         if ($game->image == null) {
             $photo = $game->current;
         } else {
@@ -68,7 +67,7 @@ class gameRepository implements gameInterface
             $file2 = $game->image_item;
             $ext2 = $file2->getClientOriginalExtension();
             $photo2 = time() . '.' . $ext2;
-            $path = $file2->move('resources/', $photo2);
+            $path2 = $file2->move('resources/', $photo2);
         }
         $data = Game::find($id);
         $data->name = $game->name;
