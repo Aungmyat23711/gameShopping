@@ -12,22 +12,25 @@ class gameRepository implements gameInterface
 {
     public function add($game)
     {
+        global $photo;
+        global $photo2;
         if ($game->image) {
             $file = $game->image;
-            $ext = $file->getClientOriginalExtension();
-            $photo = time() . '.' . $ext;
+            $ext = $file->getClientOriginalName();
+            $photo =  $ext;
             $path = $file->move('resources/', $photo);
         } else {
             $photo = null;
         }
         if ($game->image_item) {
             $file2 = $game->image_item;
-            $ext2 = $file2->getClientOriginalExtension();
-            $photo2 = time() . '.' . $ext2;
+            $ext2 = $file2->getClientOriginalName();
+            $photo2 = $ext2;
             $path2 = $file2->move('resources/', $photo2);
         } else {
             $photo2 = null;
         }
+
         $data = new Game();
         $data->name = $game->name;
         $data->release_date = $game->release_date;
@@ -52,21 +55,22 @@ class gameRepository implements gameInterface
     public function put($id, $game)
     {
 
-
+        global $photo;
+        global $photo2;
         if ($game->image == null) {
             $photo = $game->current;
         } else {
             $file = $game->image;
-            $ext = $file->getClientOriginalExtension();
-            $photo = time() . '.' . $ext;
+            $ext = $file->getClientOriginalName();
+            $photo = $ext;
             $path = $file->move('resources/', $photo);
         }
         if ($game->image_item == null) {
             $photo2 = $game->current_item;
         } else {
             $file2 = $game->image_item;
-            $ext2 = $file2->getClientOriginalExtension();
-            $photo2 = time() . '.' . $ext2;
+            $ext2 = $file2->getClientOriginalName();
+            $photo2 = $ext2;
             $path2 = $file2->move('resources/', $photo2);
         }
         $data = Game::find($id);
