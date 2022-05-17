@@ -53,7 +53,7 @@ class categoryRepository implements categoryInterface
     }
     public function getCategoryById($id)
     {
-        $data = DB::table('totalCategories')->join('categories', 'totalCategories.category_id', 'categories.id')->where('totalCategories.game_id', $id)->select('categories.*')->get();
+        $data = DB::table('totalcategories')->join('categories', 'totalcategories.category_id', 'categories.id')->where('totalcategories.game_id', $id)->select('categories.*')->get();
         return $data;
     }
     public function getAllTCount($platform)

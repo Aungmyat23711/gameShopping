@@ -305,8 +305,8 @@ export default {
       formData.append("qty", this.form.qty);
       formData.append("discount", this.form.discount);
       formData.append("platform", this.form.platform.toUpperCase());
-      formData.append("image", this.form.file);
-      formData.append("image_item", this.form.fileItem);
+      formData.append("image", this.form.file); //poster
+      formData.append("image_item", this.form.fileItem); //image
       formData.append("description", this.form.description);
       if (this.$refs.form.validate()) {
         await axios.post("/admin/insertgame", formData).then((resp) => {
