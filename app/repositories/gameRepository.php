@@ -122,7 +122,7 @@ class gameRepository implements gameInterface{
        return $data;
     }
     public function getProductsPaginate($platform){
-       $data=Game::where('platform',$platform)->paginate(10);
+       $data=Game::where('platform',$platform)->orderBy('name','asc')->paginate(10);
        return $data;
     }
     public function getAllGamesByCatId($platform,$id){
@@ -130,6 +130,7 @@ class gameRepository implements gameInterface{
         ->where('TC.category_id',$id)
         ->where('games.platform',$platform->platform)
         ->select('games.*')
+        ->orderBy('games.name','asc')
         ->get();
         return $data;
     }
@@ -152,4 +153,9 @@ class gameRepository implements gameInterface{
         $data=Game::where('platform',$platform)->get();
         return $data;
     }
+    // public function getTooManyProducts($platform){
+    //     $data=Game::where('platform',$platform)->pluck('id','name')->toArray();
+       
+    //     return $data;
+    // }
 }

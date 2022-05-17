@@ -18,7 +18,7 @@
           <v-simple-table dark>
             <thead>
               <tr>
-                <td><h3>Product</h3></td>
+                <td colspan="2"><h3>Product</h3></td>
                 <td><h3>Price</h3></td>
                 <td><h3>Platform</h3></td>
                 <td><h3>Qty</h3></td>
@@ -26,7 +26,7 @@
               </tr>
             </thead>
             <tbody>
-              <tr>
+              <tr v-if="loading">
                 <td colspan="5" align="center">
                   <v-progress-circular
                     :size="40"
@@ -38,7 +38,7 @@
                 </td>
               </tr>
               <tr v-for="data in cartGames" :key="data.fid">
-                <td style="width: 300px">
+                <td style="width: 150px">
                   <v-img
                     :src="`/resources/${data.image_item}`"
                     width="100"
@@ -54,12 +54,9 @@
                       <v-icon>clear</v-icon>
                     </v-btn>
                   </v-img>
-                  <div
-                    style="height: 100%"
-                    class="d-flex justify-center align-center"
-                  >
-                    <h4>{{ data.name }}</h4>
-                  </div>
+                </td>
+                <td>
+                  <h4>{{ data.name }}</h4>
                 </td>
                 <td>
                   <div v-if="data.discount == 0">
@@ -82,9 +79,10 @@
 
                 <td>
                   <div class="d-flex">
-                    <div style="position: relative; width: 100%" class="mt-15">
+                    <div style="position: relative; width: 60px" class="mt-15">
                       <quick-view
                         :data="data"
+                        :fab="fab"
                         :callAgain="callAgain"
                       ></quick-view>
                     </div>
@@ -119,6 +117,7 @@ export default {
       cartGames: [],
       loading: false,
       user_id: "",
+      fab: true,
       items: [
         { text: "Home", disabled: false, href: "/user/index" },
         { text: "Shopping Cart", disabled: true, href: "/user/addtocart" },

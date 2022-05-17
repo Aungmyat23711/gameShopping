@@ -2,13 +2,13 @@
   <div>
     <v-dialog transition="dialog-bottom-transition" max-width="500">
       <template v-slot:activator="{ on, attrs }">
-        <v-btn class="ml-1" text fab v-on="on" v-bind="attrs">
+        <v-btn class="ml-1" text fab v-on="on" v-bind="attrs" plain>
           <v-icon size="30">account_circle</v-icon>
         </v-btn>
       </template>
       <template v-slot:default="dialog">
         <v-card>
-          <v-toolbar>
+          <v-toolbar flat>
             My Account
             <v-spacer></v-spacer>
             <v-btn @click="dialog.value = false">X</v-btn>
@@ -76,6 +76,7 @@ export default {
       this.$store.dispatch("setUserData", null);
       eventBus.$emit("userislogout");
       this.users = [];
+      this.$router.push("/user/index");
     },
     getUser() {
       window.axios.defaults.headers.common[

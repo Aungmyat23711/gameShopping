@@ -148,6 +148,7 @@ export default {
             })
             .then((resp) => {
               this.step = this.step + 1;
+              this.$router.push("/admin/dashboard");
             });
         } else {
           this.step = this.step + 1;

@@ -30,6 +30,5 @@ class AppServiceProvider extends ServiceProvider
     {
         Game::observe(GameObserver::class);
         Order::observe(OrderObserver::class);
-     
     }
 }

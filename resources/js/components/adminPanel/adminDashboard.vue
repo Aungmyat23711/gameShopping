@@ -21,11 +21,15 @@
                   <v-subheader>
                     <span class="h5">Games</span>
                   </v-subheader>
-                  <h3 style="padding: 0 16px">100</h3>
+                  <h3 style="padding: 0 16px">
+                    {{ datas ? datas.length : 0 }}
+                  </h3>
                 </div>
               </div>
               <div class="text-center">
-                <v-btn dark style="background: orange">Check</v-btn>
+                <v-btn dark style="background: orange" @click="checkGame"
+                  ><span v-if="isGame == false">Check</span></v-btn
+                >
               </div>
             </v-card-text>
           </v-card>
@@ -48,11 +52,15 @@
                   <v-subheader>
                     <span class="h5">Users</span>
                   </v-subheader>
-                  <h3 style="padding: 0 16px">100</h3>
+                  <h3 style="padding: 0 16px">
+                    {{ users ? users.length : 0 }}
+                  </h3>
                 </div>
               </div>
               <div class="text-center">
-                <v-btn dark class="primary">Check</v-btn>
+                <v-btn dark class="primary" @click="checkUser">
+                  <span v-if="isUser == false">Check</span>
+                </v-btn>
               </div>
             </v-card-text>
           </v-card>
@@ -75,11 +83,23 @@
                   <v-subheader>
                     <span class="h5">Orders Pending</span>
                   </v-subheader>
-                  <h3 style="padding: 0 16px">100</h3>
+                  <h3 style="padding: 0 16px">
+                    {{
+                      orderlists
+                        ? orderlists.filter((data) => data.status == "pending")
+                            .length
+                        : 0
+                    }}
+                  </h3>
                 </div>
               </div>
               <div class="text-center">
-                <v-btn dark style="background: #ff00ff">Check</v-btn>
+                <v-btn
+                  dark
+                  style="background: #ff00ff"
+                  @click="checkPendingOrder"
+                  ><span v-if="isPendingOrder == false">Check</span></v-btn
+                >
               </div>
             </v-card-text>
           </v-card>
@@ -100,16 +120,38 @@
                 <v-spacer></v-spacer>
                 <div class="text-end">
                   <v-subheader>
-                    <span class="h5">Orders</span>
+                    <span class="h5">Orders Success</span>
                   </v-subheader>
-                  <h3 style="padding: 0 16px">100</h3>
+                  <h3 style="padding: 0 16px">
+                    {{
+                      orderlists
+                        ? orderlists.filter((data) => data.status == "success")
+                            .length
+                        : 0
+                    }}
+                  </h3>
                 </div>
               </div>
               <div class="text-center">
-                <v-btn dark style="background: #d72835">Check</v-btn>
+                <v-btn
+                  dark
+                  style="background: #d72835"
+                  @click="checkSuccessOrder"
+                  ><span v-if="isSuccessOrder == false">Check</span></v-btn
+                >
               </div>
             </v-card-text>
           </v-card>
+        </v-col>
+        <v-col cols="12" md="12" sm="12">
+          <order-lists
+            v-if="isPendingOrder"
+            :orderlists="orderlists"
+            :getPendingOrders="getPendingOrders"
+          />
+          <success-order-list v-if="isSuccessOrder" :orderlists="orderlists" />
+          <game-lists v-if="isGame" :datas="datas" />
+          <users-list v-if="isUser" :users="users" />
         </v-col>
       </v-row>
     </v-container>
@@ -119,14 +161,33 @@
 <script>
 import axios from "axios";
 import { mapGetters } from "vuex";
+import OrderLists from "./paths/OrderLists.vue";
+import SuccessOrderList from "./paths/SuccessOrderList.vue";
+import GameLists from "./paths/GameLists.vue";
+import UsersList from "./paths/UsersList.vue";
+import { eventBus } from "../../app";
+
 export default {
   data() {
     return {
       fullName: "",
+      orderlists: [],
+      isPendingOrder: false,
+      isSuccessOrder: false,
+      isUser: false,
+      isGame: true,
+      datas: [],
+      users: [],
     };
   },
   computed: {
     ...mapGetters(["adminData"]),
+  },
+  components: {
+    OrderLists,
+    SuccessOrderList,
+    GameLists,
+    UsersList,
   },
   methods: {
     getTwo(fullname) {
@@ -138,6 +199,47 @@ export default {
         })
         .join("");
     },
+    async getPendingOrders() {
+      await axios.get("/admin/order/getPendingOrders").then((resp) => {
+        this.orderlists = resp.data;
+      });
+    },
+    async readGames() {
+      this.loading = true;
+      await axios.get("/admin/readgame").then((resp) => {
+        this.datas = resp.data;
+        this.loading = false;
+      });
+    },
+    checkPendingOrder() {
+      this.isPendingOrder = true;
+      this.isUser = false;
+      this.isSuccessOrder = false;
+      this.isGame = false;
+    },
+    checkSuccessOrder() {
+      this.isSuccessOrder = true;
+      this.isPendingOrder = false;
+      this.isUser = false;
+      this.isGame = false;
+    },
+    checkGame() {
+      this.isSuccessOrder = false;
+      this.isPendingOrder = false;
+      this.isUser = false;
+      this.isGame = true;
+    },
+    checkUser() {
+      this.isSuccessOrder = false;
+      this.isPendingOrder = false;
+      this.isUser = true;
+      this.isGame = false;
+    },
+    async allusers() {
+      await axios.get("/admin/dashboard/getusers").then((resp) => {
+        this.users = resp.data;
+      });
+    },
   },
 
   mounted() {
@@ -148,6 +250,9 @@ export default {
       this.fullName = resp.data.name;
       this.getTwo(this.fullName);
     });
+    this.getPendingOrders();
+    this.readGames();
+    this.allusers();
   },
 };
 </script>

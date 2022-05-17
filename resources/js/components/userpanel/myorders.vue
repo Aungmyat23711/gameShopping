@@ -156,6 +156,8 @@ export default {
         .post(`/user/myorders/insert`, this.orderDatas)
         .then((resp) => {
           alert("success");
+          eventBus.$emit("submitOrder");
+          this.$router.push("/user/myorderlists");
         });
     },
   },

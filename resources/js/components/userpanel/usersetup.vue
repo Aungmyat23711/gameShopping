@@ -65,6 +65,7 @@
                   height="80"
                   width="150"
                   :style="{ 'background-color': hover ? '#4653b9' : '' }"
+                  to="/user/myorderlists"
                 >
                   <v-icon left>all_inbox</v-icon>
                   <span>My Orders</span>
@@ -77,16 +78,37 @@
           <div class="d-flex">
             <search />
             <Useraccount />
-            <v-badge color="primary" :content="whishlists" dark overlap>
-              <v-btn class="ml-1" text fab to="/user/whishlist">
-                <v-icon size="30">favorite</v-icon>
-              </v-btn>
-            </v-badge>
-            <v-badge color="primary" :content="cartlists" dark overlap>
-              <v-btn class="ml-1" text fab to="/user/addtocart">
-                <v-icon size="30">shopping_basket</v-icon>
-              </v-btn>
-            </v-badge>
+            <v-dialog max-width="600" height="600">
+              <template v-slot:activator="{ on }">
+                <v-badge color="primary" :content="whishlists" dark overlap>
+                  <v-btn
+                    plain
+                    class="ml-1"
+                    text
+                    fab
+                    v-on="!userData ? on : null"
+                    :to="!userData ? '#' : '/user/whishlist'"
+                  >
+                    <v-icon size="30">favorite</v-icon>
+                  </v-btn>
+                </v-badge>
+                <v-badge color="primary" :content="cartlists" dark overlap>
+                  <v-btn
+                    plain
+                    class="ml-1"
+                    text
+                    fab
+                    v-on="!userData ? on : null"
+                    :to="!userData ? '#' : '/user/addtocart'"
+                  >
+                    <v-icon size="30">shopping_basket</v-icon>
+                  </v-btn>
+                </v-badge>
+              </template>
+              <template v-slot:default="dialog">
+                <login-card :dialog="dialog" />
+              </template>
+            </v-dialog>
           </div>
         </v-app-bar>
         <side-nav></side-nav>
@@ -100,10 +122,9 @@
         <div class="footer-top">
           <v-row>
             <v-col cols="12" md="12">
-              <v-btn>My Account</v-btn>
-              <v-btn text>My Orders</v-btn>
-              <v-btn text>Favourate List</v-btn>
-              <v-btn text>Shooping Basket</v-btn>
+              <v-btn to="/user/myorderlists" text>My Orders</v-btn>
+              <v-btn to="/user/whishlist" text>Favourate List</v-btn>
+              <v-btn to="/user/addtocart" text>Shooping Basket</v-btn>
             </v-col>
           </v-row>
         </div>
@@ -189,6 +210,7 @@ import SideNav from "../userpanel/path/sidenav.vue";
 import { mapGetters } from "vuex";
 import axios from "axios";
 import Useraccount from "./path/useraccount.vue";
+import LoginCard from "./path/LoginCard.vue";
 import Search from "./path/search.vue";
 export default {
   data() {
@@ -216,6 +238,7 @@ export default {
     SideNav,
     Useraccount,
     Search,
+    LoginCard,
   },
   computed: {
     ...mapGetters(["userData"]),
@@ -250,6 +273,10 @@ export default {
         console.log("cartlistcount");
       });
     },
+    // goLogin(dialog) {
+    //   dialog.value = false;
+    //   this.$router.push("/user/login");
+    // },
   },
   watch: {
     userData(next, prev) {

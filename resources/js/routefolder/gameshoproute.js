@@ -12,6 +12,8 @@ import WhishList from "../components/userpanel/whishlist";
 import ShopPanel from "../components/userpanel/shopPanel";
 import addToCart from "../components/userpanel/addToCart";
 import myOrders from "../components/userpanel/myorders";
+import NotFoundPage from "../components/userpanel/NotFoundPage";
+import MyOrderList from "../components/userpanel/MyOrderList";
 import store from "../vuex";
 
 const routes = [
@@ -39,7 +41,7 @@ const routes = [
         component: AdminLogin,
         beforeEnter: (to, from, next) => {
             if (!store.getters.adminData) {
-                next("/admin/login");
+                next();
             } else {
                 next("/admin/dashboard");
             }
@@ -51,7 +53,7 @@ const routes = [
         component: AdminRegister,
         beforeEnter: (to, from, next) => {
             if (!store.getters.adminData) {
-                next("/admin/register");
+                next();
             } else {
                 next("/admin/dashboard");
             }
@@ -111,6 +113,13 @@ const routes = [
         name: "WhishList",
         path: "/user/whishlist",
         component: WhishList,
+        beforeEnter(to, from, next) {
+            if (store.getters.userData) {
+                next();
+            } else {
+                next("/user/login");
+            }
+        },
     },
     {
         name: "ShopPanel",
@@ -126,11 +135,35 @@ const routes = [
         name: "AddToCart",
         path: "/user/addtocart",
         component: addToCart,
+        beforeEnter(to, from, next) {
+            if (store.getters.userData) {
+                next();
+            } else {
+                next("/user/login");
+            }
+        },
     },
     {
         name: "MyOrders",
         path: "/user/myorders",
         component: myOrders,
+        beforeEnter(to, from, next) {
+            if (store.getters.userData) {
+                next();
+            } else {
+                next("/user/login");
+            }
+        },
+    },
+    {
+        path: "*",
+        name: "NotFoundPage",
+        component: NotFoundPage,
+    },
+    {
+        name: "MyOrderLists",
+        path: "/user/myorderlists",
+        component: MyOrderList,
     },
 ];
 export default routes;

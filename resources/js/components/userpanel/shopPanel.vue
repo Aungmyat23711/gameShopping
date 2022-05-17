@@ -14,9 +14,33 @@
             <div class="pa-2">
               <span class="caption">All</span>
               <span>
-                <v-chip x-small @click="getAllGames"> {{ allCount }}</v-chip>
+                <v-chip x-small @click="getAllGames">
+                  <v-progress-circular
+                    indeterminate
+                    color="black"
+                    :width="3"
+                    :size="10"
+                    v-if="loading"
+                  ></v-progress-circular>
+                  {{ loading == false ? allCount : null }}</v-chip
+                >
               </span>
             </div>
+            <!-- <div class="pa-2">
+              <span class="caption">Discount</span>
+              <span>
+                <v-chip x-small @click="getAllDiscount">
+                  <v-progress-circular
+                    indeterminate
+                    color="black"
+                    :width="3"
+                    :size="10"
+                    v-if="loading"
+                  ></v-progress-circular>
+                  {{ loading == false ? allCount : null }}</v-chip
+                >
+              </span>
+            </div> -->
             <div
               v-for="category in categories.slice(1, categories.length)"
               :key="category.id"

@@ -156,35 +156,43 @@
             :key="n.id"
             class="d-flex child-flex"
           >
-            <v-img
-              :src="`/resources/${n.image_item}`"
-              :lazy-src="`/resources/${n.image_item}`"
-              :alt="n.name"
-              class="img ma-5"
-              @mouseover="visible = n.id"
-            >
-              <template v-slot:placeholder>
-                <v-row class="fill-height ma-0" align="center" justify="center">
-                  <v-progress-circular
-                    indeterminate
-                    color="grey lighten-5"
-                  ></v-progress-circular>
-                </v-row>
-              </template>
-              <div class="platform ml-2">
-                <v-btn small>{{ n.platform }}</v-btn>
-              </div>
-              <v-fade-transition>
-                <div class="transition-fast-in-fast-out">
-                  <router-link
-                    :to="`/user/index/info/${n.id}`"
-                    class="d-block routelink"
+            <v-hover v-slot="{ hover }">
+              <v-img
+                :src="`/resources/${n.image_item}`"
+                :lazy-src="`/resources/${n.image_item}`"
+                :alt="n.name"
+                class="img ma-5"
+                @mouseover="visible = n.id"
+              >
+                <template v-slot:placeholder>
+                  <v-row
+                    class="fill-height ma-0"
+                    align="center"
+                    justify="center"
                   >
-                  </router-link>
-                  <quick-view :data="n"></quick-view>
+                    <v-progress-circular
+                      indeterminate
+                      color="grey lighten-5"
+                    ></v-progress-circular>
+                  </v-row>
+                </template>
+                <div class="platform ml-2">
+                  <v-btn small>{{ n.platform }}</v-btn>
                 </div>
-              </v-fade-transition>
-            </v-img>
+                <v-fade-transition>
+                  <div class="transition-fast-in-fast-out">
+                    <router-link
+                      :to="`/user/index/info/${n.id}`"
+                      class="d-block routelink"
+                    >
+                    </router-link>
+                    <div :class="hover ? 'qview' : 'hview'">
+                      <quick-view :data="n"></quick-view>
+                    </div>
+                  </div>
+                </v-fade-transition>
+              </v-img>
+            </v-hover>
           </v-slide-item>
         </v-slide-group>
       </section>
@@ -216,9 +224,7 @@
                 </v-btn>
               </div>
             </v-col>
-            <v-col cols="12" class="mt-5" align="center">
-              <v-btn>See All</v-btn>
-            </v-col>
+            <v-col cols="12" class="mt-5" align="center"> </v-col>
           </v-row>
         </div>
       </section>
@@ -374,5 +380,13 @@ h1:after {
   margin: 0 auto;
   background-color: blue;
   margin-top: 30px;
+}
+.qview {
+  opacity: 1;
+  transition: opacity 0.5s ease;
+}
+.hview {
+  opacity: 0;
+  transition: opacity 0.5s ease;
 }
 </style>

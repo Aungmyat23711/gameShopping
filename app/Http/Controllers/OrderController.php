@@ -10,12 +10,25 @@ use Illuminate\Http\Request;
 
 class OrderController extends Controller
 {
-   protected orderInterface $orderInterface;
-   public function __construct(orderInterface $orderInterface)
-   {
-       $this->orderInterface=$orderInterface;
-   }
-   public function insert(Request $req){
-       $this->orderInterface->insertOrder($req);
-   }
+    protected orderInterface $orderInterface;
+    public function __construct(orderInterface $orderInterface)
+    {
+        $this->orderInterface = $orderInterface;
+    }
+    public function insert(Request $req)
+    {
+        return $this->orderInterface->insertOrder($req);
+    }
+    public function readByUserId($uid)
+    {
+        return $this->orderInterface->readByUid($uid);
+    }
+    public function getAllPendingOrders()
+    {
+        return $this->orderInterface->gettingAllPendingOrders();
+    }
+    public function updateStatus($oid)
+    {
+        return $this->orderInterface->updatingStatus($oid);
+    }
 }

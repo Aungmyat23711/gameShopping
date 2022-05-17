@@ -157,6 +157,9 @@ export default {
         this.step = this.step - 1;
       }
     },
+    goLogin() {
+      this.$router.push("/user/login");
+    },
   },
 };
 </script>

@@ -1,6 +1,6 @@
 <template>
   <v-row>
-    <div class="loader" v-if="loading">
+    <div class="loader" v-if="mainLoading">
       <v-progress-circular
         :size="70"
         :width="7"
@@ -8,10 +8,11 @@
         indeterminate
       ></v-progress-circular>
     </div>
-    <v-col cols="12" md="12" sm="12" class="pa-0 ma-0" v-if="loading == false">
+    <v-col cols="12" md="12" sm="12" class="pa-0 ma-0">
       <v-breadcrumbs
         class="d-block"
         dark
+        v-if="mainLoading == false"
         :items="items"
         divider=">"
       ></v-breadcrumbs>
@@ -22,54 +23,72 @@
       </div>
       <mobile-top-bar />
     </v-col>
-    <v-col
-      cols="6"
-      lg="2"
-      md="3"
-      sm="3"
-      v-for="data in datas"
-      :key="data.id"
-      class="d-flex child-flex"
+    <v-card
+      dark
+      flat
+      :loading="loading"
+      width="100%"
+      v-if="mainLoading == false"
     >
-      <div v-if="loading == false">
-        <v-img
-          :src="`/resources/${data.image_item}`"
-          :lazy-src="`/resources/${data.image_item}`"
-          :aspect-ratio="32 / 16"
-          width="190"
-          height="250"
-          style="position: relative"
+      <transition-group tag="div" class="row" name="slide-up" appear>
+        <v-col
+          v-for="data in datas"
+          :key="data.id"
+          cols="6"
+          lg="2"
+          md="3"
+          sm="3"
+          class="d-block child-flex"
         >
-          <template v-slot:placeholder>
-            <v-row class="fill-height ma-0" align="center" justify="center">
-              <v-progress-circular
-                indeterminate
-                color="grey lighten-5"
-              ></v-progress-circular>
-            </v-row>
-          </template>
-          <div class="platform ml-2">
-            <v-btn dark small>{{ data.platform }}</v-btn>
+          <v-hover v-slot="{ hover }">
+            <v-img
+              :src="`/resources/${data.image_item}`"
+              :lazy-src="`/resources/${data.image_item}`"
+              :aspect-ratio="32 / 16"
+              width="190"
+              height="250"
+              style="position: relative"
+              :class="{ scaleImg: hover }"
+            >
+              <template v-slot:placeholder>
+                <v-row class="fill-height ma-0" align="center" justify="center">
+                  <v-progress-circular
+                    indeterminate
+                    color="grey lighten-5"
+                  ></v-progress-circular>
+                </v-row>
+              </template>
+              <div class="platform ml-2">
+                <v-btn dark small>{{ data.platform }}</v-btn>
+              </div>
+              <v-fade-transition>
+                <div class="transition-fast-in-fast-out">
+                  <router-link
+                    :to="`/user/index/info/${data.id}`"
+                    class="d-block routelink"
+                  >
+                  </router-link>
+
+                  <div :class="hover ? 'qview' : 'hview'">
+                    <quick-view :data="data" />
+                  </div>
+                </div>
+              </v-fade-transition>
+            </v-img>
+          </v-hover>
+          <div>
+            <h5 class="white--text font-weight-bold">{{ data.name }}</h5>
+            <h6 class="grey--text" v-if="data.discount">
+              <del class="mr-2">{{ data.price }}</del>
+              {{ data.price - (data.price * data.discount) / 100 }} MMK
+            </h6>
+            <h6 class="grey--text" v-if="!data.discount">
+              {{ data.price }} MMK
+            </h6>
           </div>
-          <v-fade-transition>
-            <div class="transition-fast-in-fast-out">
-              <router-link
-                :to="`/user/index/info/${data.id}`"
-                class="d-block routelink"
-              >
-              </router-link>
-              <quick-view :data="data"></quick-view>
-            </div>
-          </v-fade-transition>
-        </v-img>
-        <h5 class="white--text font-weight-bold">{{ data.name }}</h5>
-        <h6 class="grey--text" v-if="data.discount">
-          <del class="mr-2">{{ data.price }}</del>
-          {{ data.price - (data.price * data.discount) / 100 }} MMK
-        </h6>
-        <h6 class="grey--text" v-if="!data.discount">{{ data.price }} MMK</h6>
-      </div>
-    </v-col>
+        </v-col>
+      </transition-group>
+    </v-card>
     <v-col
       cols="12"
       md="12"
@@ -78,7 +97,7 @@
       v-if="isCat"
     >
       <v-pagination
-        v-if="loading == false"
+        v-if="mainLoading == false"
         :hidden="isSearch"
         v-model="pagination.currentPage"
         :length="pagination.totalPage"
@@ -109,6 +128,7 @@ export default {
       ],
       // datas: [],
       loading: false,
+      mainLoading: false,
       isCat: false,
       pagination: {
         currentPage: this.$route.params.current
@@ -130,7 +150,7 @@ export default {
   },
   methods: {
     async getAllProductsWithPaginate() {
-      // this.loading = true;
+      this.mainLoading = true;
       let platform = this.$route.params.platform.toUpperCase();
       await axios
         .get(
@@ -142,7 +162,7 @@ export default {
           this.allDatas = resp.data.data;
           this.pagination.currentPage = resp.data.current_page;
           this.pagination.totalPage = resp.data.last_page;
-          // this.loading = false;
+          this.mainLoading = false;
           this.items.pop();
           this.items = [
             ...this.items,
@@ -168,14 +188,14 @@ export default {
       }
     },
     async getGamesByCategoryId(id, platform) {
-      // this.loading = true;
+      this.loading = true;
       await axios
         .post(`/user/shop/getGamesByCategoryId/${id}`, {
           platform: platform.toUpperCase(),
         })
         .then((resp) => {
           this.allDatas = resp.data;
-          // this.loading = false;
+          this.loading = false;
         });
     },
   },
@@ -201,7 +221,6 @@ export default {
     this.getAllProductsWithPaginate();
     this.getAllProducts();
     eventBus.$on("getByCatId", (props) => {
-      console.log("count");
       this.items.pop();
       this.getGamesByCategoryId(props.id, props.platform);
       this.items = [
@@ -247,5 +266,27 @@ export default {
   display: flex;
   justify-content: center;
   align-items: center;
+}
+.slide-up-enter {
+  transform: translateX(20px);
+  opacity: 0;
+}
+.slide-up-enter-active,
+.slide-up-leave-active {
+  transition: all 0.5s ease-out;
+}
+.slide-up-move {
+  transition: transform 0.5s ease-out;
+}
+.slide-up-leave-to {
+  opacity: 0;
+}
+.qview {
+  opacity: 1;
+  transition: opacity 0.5s ease;
+}
+.hview {
+  opacity: 0;
+  transition: opacity 0.5s ease;
 }
 </style>

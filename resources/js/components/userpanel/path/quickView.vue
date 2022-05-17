@@ -5,15 +5,16 @@
         v-on="on"
         v-bind="attrs"
         class="primary img-btn"
-        tile
-        large
+        :large="!fab"
+        :fab="fab"
+        :tile="!fab"
         width="100%"
         @click="data.cartqty ? checkQty(data.cartqty) : null"
       >
-        Quick View
+        {{ fab ? "Preview" : " Quick View" }}
       </v-btn>
     </template>
-    <template v-slot:default="dialog">
+    <template v-slot:default="modal">
       <v-card dark>
         <v-card-text>
           <v-row>
@@ -107,7 +108,7 @@
 
               <v-divider dark></v-divider>
               <v-row>
-                <v-col cols="12" md="6">
+                <v-col cols="12" md="6" v-if="$route.path != '/user/whishlist'">
                   <v-btn-toggle tile borderless>
                     <v-btn @click="qty--" :disabled="qty == 0"> - </v-btn>
                     <v-text-field
@@ -123,36 +124,60 @@
                     {{ qtyError }}
                   </span>
                 </v-col>
-                <v-col cols="12" md="6">
-                  <v-btn
-                    tile
-                    large
-                    class="primary"
-                    dark
-                    @click="
-                      condition == 1
-                        ? updateCart(data.cartid, dialog)
-                        : addToCart(dialog)
-                    "
-                  >
-                    <v-icon>shopping_bag</v-icon>
-                    <span>{{
-                      condition == 1 ? "Update Cart" : "Add To Cart"
-                    }}</span>
-                  </v-btn>
+                <v-col cols="12" md="6" v-if="$route.path != '/user/whishlist'">
+                  <v-dialog max-width="600" v-model="dialog.value">
+                    <template v-slot:activator="{ on }">
+                      <v-btn
+                        tile
+                        large
+                        class="primary"
+                        dark
+                        v-on="!userData ? on : null"
+                        @click="
+                          userData
+                            ? condition == 1
+                              ? updateCart(data.cartid, modal)
+                              : addToCart(modal)
+                            : null
+                        "
+                      >
+                        <v-icon>shopping_bag</v-icon>
+                        <span>{{
+                          condition == 1 ? "Update Cart" : "Add To Cart"
+                        }}</span>
+                      </v-btn>
+                      <v-btn
+                        tile
+                        large
+                        class="primary mt-3"
+                        dark
+                        v-on="!userData ? on : null"
+                        @click="
+                          userData
+                            ? $route.path == '/user/addtocart'
+                              ? (modal.value = false)
+                              : goToCart()
+                            : null
+                        "
+                      >
+                        <v-icon>shopping_bag</v-icon>
+                        <span>Go To Cart</span>
+                      </v-btn>
+                    </template>
+
+                    <login-card :dialog="dialog" />
+                  </v-dialog>
+                </v-col>
+                <v-col cols="12" md="6" v-if="$route.path == '/user/whishlist'">
                   <v-btn
                     tile
                     large
                     class="primary mt-3"
                     dark
-                    @click="
-                      $route.path == '/user/addtocart'
-                        ? (dialog.value = false)
-                        : goToCart()
-                    "
+                    @click="viewInfo(modal, data.id)"
                   >
-                    <v-icon>shopping_bag</v-icon>
-                    <span>Go To Cart</span>
+                    <v-icon>info</v-icon>
+                    <span>View Info</span>
                   </v-btn>
                 </v-col>
               </v-row>
@@ -160,7 +185,7 @@
           </v-row>
         </v-card-text>
         <v-card-actions>
-          <v-btn @click="dialog.value = false">Close</v-btn>
+          <v-btn @click="modal.value = false">Close</v-btn>
         </v-card-actions>
       </v-card>
     </template>
@@ -171,18 +196,23 @@
 import { mapGetters } from "vuex";
 import { eventBus } from "../../../app";
 import { exampleMixin } from "../utils/reuseable";
+import LoginCard from "./LoginCard.vue";
 export default {
+  components: { LoginCard },
   mixins: [exampleMixin],
   data() {
     return {
-      qty: 0,
+      qty: 1,
       allCategory: [],
       user_id: "",
       condition: 0,
       qtyError: "",
+      dialog: {
+        value: false,
+      },
     };
   },
-  props: ["data", "callAgain"],
+  props: ["data", "fab", "callAgain"],
   methods: {
     scrollTop() {
       window.scrollTo(0, 0);
@@ -190,7 +220,7 @@ export default {
     checkQty(cartqty) {
       this.qty = cartqty;
     },
-    async addToCart(dialog) {
+    async addToCart(modal) {
       if (this.qty != 0) {
         await axios
           .post("/user/index/addtocart", {
@@ -199,7 +229,7 @@ export default {
             qty: this.qty,
           })
           .then((resp) => {
-            dialog.value = false;
+            modal.value = false;
             eventBus.$emit("addCartList");
           });
       } else {
@@ -207,7 +237,7 @@ export default {
       }
     },
 
-    async updateCart(id, dialog) {
+    async updateCart(id, modal) {
       if (this.qty != 0) {
         let formData = new FormData();
         formData.append("user_id", this.user_id);
@@ -218,7 +248,7 @@ export default {
           .post(`/user/index/updatecart/${id}`, formData)
           .then((resp) => {
             this.callAgain();
-            dialog.value = false;
+            modal.value = false;
           });
       } else {
         this.qtyError = "Please Choose At Least One Item";
@@ -236,7 +266,7 @@ export default {
           if (resp.data.qty[0]) {
             this.qty = resp.data.qty[0];
           } else {
-            this.qty = 0;
+            this.qty = 1;
           }
           this.cartloading = false;
         });
@@ -244,6 +274,10 @@ export default {
     increaseQty() {
       this.qty++;
       this.qtyError = "";
+    },
+    viewInfo(modal, id) {
+      modal.value = false;
+      this.$router.push(`/user/index/info/${id}`);
     },
   },
   computed: {

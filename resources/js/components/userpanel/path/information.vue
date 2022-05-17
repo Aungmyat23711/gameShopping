@@ -15,8 +15,8 @@
             ></v-skeleton-loader>
             <v-img
               v-if="loading == false"
-              :src="`/resources/${datas.image_item}`"
-              :lazy-src="`/resources/${datas.image_item}`"
+              :src="`/resources/${datas ? datas.image_item : null}`"
+              :lazy-src="`/resources/${datas ? datas.image_item : null}`"
               :aspect-ratio="20 / 26"
               style="position: relative"
             >
@@ -141,70 +141,63 @@
               </v-btn>
             </v-col>
             <v-col cols="12" md="6">
-              <v-btn
-                tile
-                large
-                class="primary"
-                :disabled="loading"
-                :loading="cartloading"
-                dark
-                @click="condition == 1 ? goToCart() : addToCart()"
-              >
-                <v-icon>shopping_bag</v-icon>
-                <span>{{ condition == 1 ? "Go To Cart" : "Add To Cart" }}</span>
-              </v-btn>
-              <v-btn
-                text
-                color="primary"
-                class="mt-5"
-                :disabled="loading"
-                :loading="whistlistLoader"
-                @click="count != 0 ? goWhistlist() : addWhistlist()"
-              >
-                <v-icon left>{{
-                  count != 0 ? "favorite" : "favorite_border"
-                }}</v-icon>
-                <span>{{
-                  count != 0 ? "Go to wishlist" : "Add to wishlist"
-                }}</span>
-              </v-btn>
+              <v-dialog max-width="600" height="600">
+                <template v-slot:activator="{ on }">
+                  <v-btn
+                    tile
+                    large
+                    class="primary"
+                    :disabled="loading"
+                    :loading="cartloading"
+                    dark
+                    v-on="!userData ? on : null"
+                    @click="
+                      userData
+                        ? condition == 1
+                          ? goToCart()
+                          : addToCart()
+                        : null
+                    "
+                  >
+                    <v-icon>shopping_bag</v-icon>
+                    <span>{{
+                      condition == 1 ? "Go To Cart" : "Add To Cart"
+                    }}</span>
+                  </v-btn>
+                  <v-btn
+                    text
+                    color="primary"
+                    class="mt-5"
+                    :disabled="loading"
+                    :loading="whistlistLoader"
+                    v-on="!userData ? on : null"
+                    @click="
+                      userData
+                        ? count != 0
+                          ? goWhistlist()
+                          : addWhistlist()
+                        : null
+                    "
+                  >
+                    <v-icon left>{{
+                      count != 0 ? "favorite" : "favorite_border"
+                    }}</v-icon>
+                    <span>{{
+                      count != 0 ? "Go to wishlist" : "Add to wishlist"
+                    }}</span>
+                  </v-btn>
+                </template>
+                <template v-slot:default="dialog">
+                  <login-card :dialog="dialog" />
+                </template>
+              </v-dialog>
             </v-col>
           </v-row>
         </v-col>
       </v-row>
       <v-row>
         <v-col cols="12" md="12">
-          <v-tabs dark v-model="model">
-            <v-tab>Description</v-tab>
-            <v-tab>Additional Information</v-tab>
-            <v-tab>Review</v-tab>
-          </v-tabs>
-          <v-tabs-items v-model="model" dark>
-            <v-tab-item>
-              <v-container>
-                <span class="grey--text"> {{ datas.description }}</span>
-              </v-container>
-            </v-tab-item>
-            <v-tab-item>
-              <v-container>
-                <v-row>
-                  <v-col cols="12" md="12">
-                    <v-simple-table class="black darken-2">
-                      <tbody>
-                        <tr>
-                          <td>Game Mode</td>
-                          <td>{{ datas.game_mode }}</td>
-                        </tr>
-                      </tbody>
-                    </v-simple-table>
-                  </v-col>
-                </v-row>
-              </v-container>
-            </v-tab-item>
-            <v-tab-item>
-              <v-card>Hello World3</v-card>
-            </v-tab-item>
-          </v-tabs-items>
+          <sub-information :datas="datas" />
         </v-col>
       </v-row>
     </v-container>
@@ -217,8 +210,11 @@ import { mapGetters } from "vuex";
 import "../../../../css/information.css";
 import { exampleMixin } from "../utils/reuseable";
 import { eventBus } from "../../../app";
+import LoginCard from "./LoginCard.vue";
+import SubInformation from "./SubInformation.vue";
 export default {
   mixins: [exampleMixin],
+  components: { LoginCard, SubInformation },
   data() {
     return {
       items: [{ text: "Home", disabled: false, href: "/user/index" }],
@@ -229,10 +225,10 @@ export default {
       whistlistLoader: false,
       cartloading: false,
       isFav: false,
-      model: null,
+
       user_id: "",
       count: "",
-      condition: 0,
+      condition: "",
     };
   },
   methods: {
@@ -305,6 +301,7 @@ export default {
     },
     async checkInCart(id) {
       this.cartloading = true;
+
       await axios
         .get(`/user/information/checkincart/${id}/${this.user_id}`)
         .then((resp) => {
@@ -330,7 +327,7 @@ export default {
         this.user_id = resp.data.id;
         this.getByGameId();
         this.isWhistList();
-        this.checkInCart(this.data[0].id);
+        this.checkInCart(this.$route.params.id);
       });
     } else {
       this.getByGameId();

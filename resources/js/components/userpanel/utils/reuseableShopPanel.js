@@ -31,6 +31,7 @@ export const shopPanel = {
         },
         async getAlldata() {
             let platform = this.$route.params.platform.toUpperCase();
+            this.allCount = "";
             await axios
                 .get(`/user/shop/getAllCount/${platform}`)
                 .then((resp) => {
@@ -43,6 +44,9 @@ export const shopPanel = {
 
         getAllGames() {
             eventBus.$emit("getAllGames");
+        },
+        getAllDiscount() {
+            eventBus.$emit("getAllDiscount");
         },
         filter() {
             eventBus.$emit("postRange");

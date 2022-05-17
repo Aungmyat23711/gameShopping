@@ -14,36 +14,45 @@ class AuthController extends Controller
     protected authInterface $authInterface;
     public function __construct(authInterface $authInterface)
     {
-        $this->authInterface=$authInterface;
+        $this->authInterface = $authInterface;
     }
-    public function register(Request $request){
+    public function register(Request $request)
+    {
         Admin::create([
-            'name'=>$request->name,
-            'email'=>$request->email,
-            'password'=>Hash::make($request->password)
+            'name' => $request->name,
+            'email' => $request->email,
+            'password' => Hash::make($request->password)
         ]);
-        return response()->json(['msg'=>'Registered Successfully']);
+        return response()->json(['msg' => 'Registered Successfully']);
     }
-    public function login(Request $request){
-      $admin=Admin::where('email',$request->email)->first();
-      if(!$admin || !Hash::check($request->password,$admin->password)){
-          return response()->json(['msg'=>'The provided creditials are incorrect']);
-      }
-       return $admin->createToken($request->email)->plainTextToken;
+    public function login(Request $request)
+    {
+        $admin = Admin::where('email', $request->email)->first();
+        if (!$admin || !Hash::check($request->password, $admin->password)) {
+            return response()->json(['msg' => 'The provided creditials are incorrect']);
+        }
+        return $admin->createToken($request->email)->plainTextToken;
     }
-    public function registerUser(Request $request){
+    public function registerUser(Request $request)
+    {
         User::create([
-            'name'=>$request->name,
-            'email'=>$request->email,
-            'password'=>Hash::make($request->password)
+            'name' => $request->name,
+            'email' => $request->email,
+            'password' => Hash::make($request->password)
         ]);
-        return response()->json(['msg'=>'Registered Successfully']);
+        return response()->json(['msg' => 'Registered Successfully']);
     }
-    public function loginUser(Request $request){
-      $user=User::where('email',$request->email)->first();
-      if(!$user || !Hash::check($request->password,$user->password)){
-          return response()->json(['msg'=>'The provided creditials are incorrect']);
-      }
-       return $user->createToken($request->email)->plainTextToken;
+    public function loginUser(Request $request)
+    {
+        $user = User::where('email', $request->email)->first();
+        if (!$user || !Hash::check($request->password, $user->password)) {
+            return response()->json(['msg' => 'The provided creditials are incorrect']);
+        }
+        return $user->createToken($request->email)->plainTextToken;
+    }
+    public function getAllUsers()
+    {
+        $user = User::all();
+        return $user;
     }
 }

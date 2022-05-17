@@ -28,8 +28,8 @@
           height="55"
           placeholder="Enter Your Password"
           prepend-inner-icon="lock"
-          :type="isClickPass ? 'password' : 'text'"
-          :append-icon="isClickPass ? 'visibility_off' : 'visibility'"
+          :type="isClickPass ? 'text' : 'password'"
+          :append-icon="isClickPass ? 'visibility' : 'visibility_off'"
           @click:append="isClickPass = !isClickPass"
           solo
           v-model="form.password"
@@ -64,6 +64,7 @@ export default {
         .post("/api/login", this.form)
         .then((resp) => {
           this.$store.dispatch("setAdminData", resp.data);
+          this.$router.push("/admin/dashboard");
         })
         .catch((errors) => {
           this.errors = errors.response.data.errors;

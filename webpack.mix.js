@@ -3,7 +3,7 @@ var VuetifyLoaderPlugin = require("vuetify-loader/lib/plugin");
 var CaseSensitivePathsPlugin = require("case-sensitive-paths-webpack-plugin");
 
 mix.browserSync({
-    proxy: "http://127.0.0.1:8000",
+    proxy: "http://127.0.0.1:8000/user/index",
 });
 var webpackConfig = {
     plugins: [new VuetifyLoaderPlugin(), new CaseSensitivePathsPlugin()],

@@ -7,7 +7,7 @@
       width="500px"
     >
       <template v-slot:activator="{ on }">
-        <v-btn class="ml-1" text fab v-on="on">
+        <v-btn class="ml-1" text fab v-on="on" plain>
           <v-icon size="30">search</v-icon>
         </v-btn>
       </template>

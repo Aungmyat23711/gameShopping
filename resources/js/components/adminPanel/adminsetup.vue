@@ -26,7 +26,17 @@
       </header>
       <v-main> <router-view></router-view></v-main>
 
-      <v-footer> </v-footer>
+      <v-footer dark class="px-0" app>
+        <div class="footer-bottom">
+          <v-row>
+            <v-col md="6" offset-md="3">
+              <v-subheader class="justify-center">
+                ammgyi@copyright 2022. All Right Reserved.
+              </v-subheader>
+            </v-col>
+          </v-row>
+        </div>
+      </v-footer>
     </v-app>
   </div>
 </template>
@@ -51,5 +61,23 @@ export default {
 };
 </script>
 
-<style>
+<style lang="scss" scoped>
+.footer {
+  list-style: none;
+}
+.footer li {
+  display: inline-block;
+}
+
+@media only screen and (max-width: 1000px) {
+  .footer-left {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    height: 100px;
+  }
+}
+.footer-bottom {
+  width: 100%;
+}
 </style>

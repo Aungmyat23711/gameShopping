@@ -8,9 +8,10 @@
           v-model="select"
           :items="categories"
           item-text="category"
+          item-value="id"
           label="Category"
           hide-details
-          @change="changing"
+          @change="changing(select)"
         >
         </v-select>
       </v-col>
@@ -39,6 +40,7 @@
 
 <script>
 import { mapGetters } from "vuex";
+import { eventBus } from "../../../app";
 import { shopPanel } from "../utils/reuseableShopPanel";
 export default {
   mixins: [shopPanel],
@@ -54,9 +56,6 @@ export default {
     };
   },
   methods: {
-    changing() {
-      alert("change");
-    },
     sliding(event) {
       this.$store.dispatch("setRangeData", event);
     },
@@ -65,6 +64,13 @@ export default {
         this.categories = resp.data;
         this.categories.unshift({ category: "All" });
       });
+    },
+    changing(id) {
+      let platform = this.$route.params.platform;
+      eventBus.$emit("getByCatId", { id, platform });
+      if (this.select == "All") {
+        eventBus.$emit("getAllGames");
+      }
     },
   },
   mounted() {
