@@ -76,6 +76,12 @@ const routes = [
     },
     // User
     {
+        name: "User Panel",
+        path: "/",
+        redirect: "/user/index",
+        component: UserIndex,
+    },
+    {
         name: "User Index",
         path: "/user/index",
         component: UserIndex,

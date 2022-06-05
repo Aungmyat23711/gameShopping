@@ -422,13 +422,16 @@ export default {
       this.loading = true;
       let formData = new FormData();
       formData.append("_method", "DELETE");
-      confirm("Are you sure want to delete") &&
-        (await axios
+      if (confirm("Are your sure want to delete this item")) {
+        await axios
           .post(`/admin/addgame/deleteItem/${id}`, formData)
           .then((resp) => {
             this.loading = false;
             this.readGames();
-          }));
+          });
+      } else {
+        this.loading = false;
+      }
     },
     async readPlatform() {
       await axios.get("/admin/sub/read").then((resp) => {

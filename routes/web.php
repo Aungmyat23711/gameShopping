@@ -16,7 +16,7 @@ use App\Models\Platform;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 
-Route::view('/', 'setup');
+Route::view('/', 'usersetup');
 Route::view('/admin/sub', 'adminsetup');
 // Platform
 Route::post('/admin/sub/create', [PlatformController::class, 'create']);
